@@ -50,12 +50,13 @@
               </el-tag>
             </div>
             <div class="result-title">
-              <h3>{{ doc.title || '无标题' }}</h3>
+              <h3>{{ doc.title || doc.metadata?.title || '无标题' }}</h3>
               <div class="result-meta">
-                <span v-if="doc.similarity !== undefined">
-                  相似度：<el-tag size="small">{{ (doc.similarity * 100).toFixed(2) }}%</el-tag>
+                <span v-if="doc.score !== undefined">
+                  相似度分数：<el-tag size="small" type="success">{{ doc.score.toFixed(4) }}</el-tag>
                 </span>
                 <span v-if="doc.id">ID: {{ doc.id }}</span>
+                <span v-if="doc.metadata?.createdAt">创建时间: {{ doc.metadata.createdAt }}</span>
               </div>
             </div>
           </div>

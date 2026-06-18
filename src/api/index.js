@@ -23,6 +23,14 @@ api.interceptors.response.use(
  */
 export function ragAnswer(question, topK = 3) {
   return api.post('/answer', null, { params: { question, topK } })
+    .then(response => {
+      // 后端返回 { question, answer }
+      return {
+        question: response.question,
+        answer: response.answer,
+        retrievedDocs: [] // 如果后端返回检索文档，可以在这里处理
+      }
+    })
 }
 
 /**
@@ -31,6 +39,13 @@ export function ragAnswer(question, topK = 3) {
  */
 export function ragChat(message) {
   return api.post('/chat', null, { params: { message } })
+    .then(response => {
+      // 后端直接返回字符串
+      return {
+        answer: response,
+        response: response
+      }
+    })
 }
 
 /**
@@ -39,6 +54,16 @@ export function ragChat(message) {
  */
 export function saveDocument(data) {
   return api.post('/document', data)
+    .then(response => {
+      // 后端返回 Document 对象
+      return {
+        id: response.id,
+        title: response.title,
+        content: response.content,
+        createdAt: response.createdAt,
+        updatedAt: response.updatedAt
+      }
+    })
 }
 
 /**
@@ -46,6 +71,10 @@ export function saveDocument(data) {
  */
 export function getDocuments() {
   return api.get('/documents')
+    .then(response => {
+      // 后端返回 Document 列表
+      return Array.isArray(response) ? response : []
+    })
 }
 
 /**
@@ -54,6 +83,16 @@ export function getDocuments() {
  */
 export function getDocumentById(id) {
   return api.get(`/document/${id}`)
+    .then(response => {
+      // 后端返回 Document 对象
+      return {
+        id: response.id,
+        title: response.title,
+        content: response.content,
+        createdAt: response.createdAt,
+        updatedAt: response.updatedAt
+      }
+    })
 }
 
 /**
@@ -71,4 +110,13 @@ export function deleteDocument(id) {
  */
 export function searchSimilar(query, topK = 3) {
   return api.get('/search', { params: { query, topK } })
+    .then(response => {
+      // 后端返回 Spring AI Document 列表
+      return Array.isArray(response) ? response.map(doc => ({
+        id: doc.metadata?.id,
+        title: doc.metadata?.title,
+        content: doc.content,
+        score: doc.metadata?.score || doc.metadata?.distance
+      })) : []
+    })
 }
